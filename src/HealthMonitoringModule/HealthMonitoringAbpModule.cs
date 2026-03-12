@@ -13,26 +13,32 @@ public class HealthMonitoringAbpModule : AbpModule
         context.Services.AddHealthChecks()
             // 1. Redis
             .AddRedis(
-                redisConnectionString: configuration.GetConnectionString("Redis") ?? "localhost:6379",
+                redisConnectionString: configuration.GetConnectionString("Redis")!,
                 name: "Redis-Check",
                 tags: new[] { "infrastructure", "redis" })
             // 2. MongoDB
             .AddMongoDb(
-                mongodbConnectionString: configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017",
+                mongodbConnectionString: configuration.GetConnectionString("MongoDb")!,
                 name: "MongoDb-Check",
                 tags: new[] { "infrastructure", "mongodb"})
             // 3. Kafka
             .AddKafka(
                 setup: options => 
                 {
-                    options.BootstrapServers = configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+                    options.BootstrapServers = configuration["Kafka:BootstrapServers"]!;
                 },
                 name: "Kafka-Check",
                 tags: new[] { "infrastructure", "kafka" })
             // 4. Filepath Access Check
             .AddCheck("FilePath-Check", () => 
             {
-                var testPath = configuration["HealthChecks:FilePath"] ?? System.IO.Path.GetTempPath();
+                // Rely strictly on configuration
+                var testPath = configuration["HealthChecks:FilePath"];
+                if (string.IsNullOrEmpty(testPath)) 
+                {
+                    return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("HealthChecks:FilePath configuration is missing.");
+                }
+
                 try
                 {
                     // Verify read/write access to the specific file path
@@ -45,7 +51,12 @@ public class HealthMonitoringAbpModule : AbpModule
                 {
                     return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy($"Failed to access directory {testPath}.", ex);
                 }
-            }, tags: new[] { "infrastructure", "filepath" });
+            }, tags: new[] { "infrastructure", "filepath" })
+            // 5. Oracle DB Check (Basic / Readiness)
+            .AddOracle(
+                configuration.GetConnectionString("Oracle")!,
+                name: "Oracle-Basic-Check",
+                tags: new[] { "infrastructure", "database", "oracle" });
                 
         // Note: The Deep Oracle Schema Validation (DB-First) Health Check 
         // typically needs to be registered here targeting an specific EF Core DbContext:
