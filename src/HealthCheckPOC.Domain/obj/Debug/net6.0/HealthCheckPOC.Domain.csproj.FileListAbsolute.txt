@@ -1,0 +1,15 @@
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\bin\Debug\net6.0\HealthCheckPOC.Domain.deps.json
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\bin\Debug\net6.0\HealthCheckPOC.Domain.dll
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\bin\Debug\net6.0\HealthCheckPOC.Domain.pdb
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\bin\Debug\net6.0\HealthCheckPOC.Domain.Shared.dll
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\bin\Debug\net6.0\HealthCheckPOC.Domain.Shared.pdb
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.csproj.AssemblyReference.cache
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.AssemblyInfoInputs.cache
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.AssemblyInfo.cs
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.csproj.CoreCompileInputs.cache
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCh.DF058344.Up2Date
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.dll
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\refint\HealthCheckPOC.Domain.dll
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\HealthCheckPOC.Domain.pdb
+D:\HealthCheckPOC\src\HealthCheckPOC.Domain\obj\Debug\net6.0\ref\HealthCheckPOC.Domain.dll

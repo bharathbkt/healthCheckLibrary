@@ -1,0 +1,12 @@
+D:\HealthCheckPOC\src\HealthMonitoringModule\bin\Debug\net6.0\HealthMonitoringModule.deps.json
+D:\HealthCheckPOC\src\HealthMonitoringModule\bin\Debug\net6.0\HealthMonitoringModule.dll
+D:\HealthCheckPOC\src\HealthMonitoringModule\bin\Debug\net6.0\HealthMonitoringModule.pdb
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.csproj.AssemblyReference.cache
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.GeneratedMSBuildEditorConfig.editorconfig
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.AssemblyInfoInputs.cache
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.AssemblyInfo.cs
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.csproj.CoreCompileInputs.cache
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.dll
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\refint\HealthMonitoringModule.dll
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\HealthMonitoringModule.pdb
+D:\HealthCheckPOC\src\HealthMonitoringModule\obj\Debug\net6.0\ref\HealthMonitoringModule.dll

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HealthCheckPOC.Application.Contracts/HealthCheckPOC.Application.Contracts.csproj" />
+    <Project Path="src/HealthCheckPOC.Application/HealthCheckPOC.Application.csproj" />
+    <Project Path="src/HealthCheckPOC.Domain.Shared/HealthCheckPOC.Domain.Shared.csproj" />
+    <Project Path="src/HealthCheckPOC.Domain/HealthCheckPOC.Domain.csproj" />
+    <Project Path="src/HealthCheckPOC.EntityFrameworkCore/HealthCheckPOC.EntityFrameworkCore.csproj" />
+    <Project Path="src/HealthCheckPOC.HttpApi.Host/HealthCheckPOC.HttpApi.Host.csproj" />
+    <Project Path="src/HealthMonitoringModule/HealthMonitoringModule.csproj" />
+  </Folder>
+</Solution>

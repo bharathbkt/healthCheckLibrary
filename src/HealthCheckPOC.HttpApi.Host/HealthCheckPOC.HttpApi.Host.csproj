@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="6.0.0" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HealthCheckPOC.Application\HealthCheckPOC.Application.csproj" />
+    <ProjectReference Include="..\HealthCheckPOC.EntityFrameworkCore\HealthCheckPOC.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\HealthMonitoringModule\HealthMonitoringModule.csproj" />
+  </ItemGroup>
+
+</Project>
