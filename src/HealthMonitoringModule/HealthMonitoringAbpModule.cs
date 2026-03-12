@@ -9,18 +9,22 @@ public class HealthMonitoringAbpModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
+        var timeoutSeconds = configuration.GetValue<int>("HealthChecks:TimeoutSeconds", 3);
+        var timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
         context.Services.AddHealthChecks()
             // 1. Redis
             .AddRedis(
                 redisConnectionString: configuration.GetConnectionString("Redis")!,
                 name: "Redis-Check",
-                tags: new[] { "infrastructure", "redis" })
+                tags: new[] { "infrastructure", "redis" },
+                timeout: timeout)
             // 2. MongoDB
             .AddMongoDb(
                 mongodbConnectionString: configuration.GetConnectionString("MongoDb")!,
                 name: "MongoDb-Check",
-                tags: new[] { "infrastructure", "mongodb"})
+                tags: new[] { "infrastructure", "mongodb"},
+                timeout: timeout)
             // 3. Kafka
             .AddKafka(
                 setup: options => 
@@ -28,7 +32,8 @@ public class HealthMonitoringAbpModule : AbpModule
                     options.BootstrapServers = configuration["Kafka:BootstrapServers"]!;
                 },
                 name: "Kafka-Check",
-                tags: new[] { "infrastructure", "kafka" })
+                tags: new[] { "infrastructure", "kafka" },
+                timeout: timeout)
             // 4. Filepath Access Check
             .AddCheck("FilePath-Check", () => 
             {
@@ -51,12 +56,13 @@ public class HealthMonitoringAbpModule : AbpModule
                 {
                     return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy($"Failed to access directory {testPath}.", ex);
                 }
-            }, tags: new[] { "infrastructure", "filepath" })
+            }, tags: new[] { "infrastructure", "filepath" }, timeout: timeout)
             // 5. Oracle DB Check (Basic / Readiness)
             .AddOracle(
                 configuration.GetConnectionString("Oracle")!,
                 name: "Oracle-Basic-Check",
-                tags: new[] { "infrastructure", "database", "oracle" });
+                tags: new[] { "infrastructure", "database", "oracle" },
+                timeout: timeout);
                 
         // Note: The Deep Oracle Schema Validation (DB-First) Health Check 
         // typically needs to be registered here targeting an specific EF Core DbContext:

@@ -24,6 +24,8 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
+        var timeoutSeconds = configuration.GetValue<int>("HealthChecks:TimeoutSeconds", 3);
+        var timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
         context.Services.AddControllers();
         context.Services.AddEndpointsApiExplorer();
@@ -34,7 +36,8 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
             .AddCheck<OracleSchemaValidationHealthCheck<HealthCheckPOCDbContext>>(
                 name: "Oracle-Schema-Deep-Check",
                 failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded,
-                tags: new[] { "deep", "oracle", "database" });
+                tags: new[] { "deep", "oracle", "database" },
+                timeout: timeout);
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
@@ -58,7 +61,8 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
             // 1. Liveness Probe (immediate response, no dependency checks)
             endpoints.MapHealthChecks("/health/live", new HealthCheckOptions
             {
-                Predicate = _ => false
+                Predicate = _ => false,
+                ResponseWriter = CustomHealthCheckFormatter.WriteResponse
             });
 
             // 2. Readiness Probe (checks Kafka, Redis, MongoDB, Filepath Access)
@@ -66,13 +70,15 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
             {
                 Predicate = check => check.Tags.Contains("infrastructure") || 
                                      check.Tags.Contains("database") || 
-                                     check.Tags.Contains("filepath")
+                                     check.Tags.Contains("filepath"),
+                ResponseWriter = CustomHealthCheckFormatter.WriteResponse
             });
 
             // 3. Startup/Deep Probe (Oracle Schema validation)
             endpoints.MapHealthChecks("/health/startup", new HealthCheckOptions
             {
-                Predicate = check => check.Tags.Contains("deep")
+                Predicate = check => check.Tags.Contains("deep"),
+                ResponseWriter = CustomHealthCheckFormatter.WriteResponse
             });
         });
     }
