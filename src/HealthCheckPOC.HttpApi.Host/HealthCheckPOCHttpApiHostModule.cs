@@ -36,7 +36,7 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
             .AddCheck<OracleSchemaValidationHealthCheck<HealthCheckPOCDbContext>>(
                 name: "Oracle-Schema-Deep-Check",
                 failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded,
-                tags: new[] { "deep", "oracle", "database" },
+                tags: new[] { "deep", "oracle" },
                 timeout: timeout);
     }
 
