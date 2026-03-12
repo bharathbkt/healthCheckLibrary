@@ -9,27 +9,35 @@ public class HealthMonitoringAbpModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
-        var timeoutSeconds = configuration.GetValue<int>("HealthChecks:TimeoutSeconds", 3);
+        
+        // Bind settings from HealthMonitoring section
+        var options = new HealthMonitoringOptions();
+        configuration.GetSection("HealthMonitoring").Bind(options);
+
+        // Make options available in DI for future use
+        context.Services.Configure<HealthMonitoringOptions>(configuration.GetSection("HealthMonitoring"));
+
+        var timeoutSeconds = configuration.GetValue<int>(options.TimeoutSecondsKey, 3);
         var timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
         context.Services.AddHealthChecks()
             // 1. Redis
             .AddRedis(
-                redisConnectionString: configuration.GetConnectionString("Redis")!,
+                redisConnectionString: configuration.GetConnectionString(options.RedisConnectionName) ?? configuration[options.RedisConnectionName]!,
                 name: "Redis-Check",
                 tags: new[] { "infrastructure", "redis" },
                 timeout: timeout)
             // 2. MongoDB
             .AddMongoDb(
-                mongodbConnectionString: configuration.GetConnectionString("MongoDb")!,
+                mongodbConnectionString: configuration.GetConnectionString(options.MongoDbConnectionName) ?? configuration[options.MongoDbConnectionName]!,
                 name: "MongoDb-Check",
                 tags: new[] { "infrastructure", "mongodb"},
                 timeout: timeout)
             // 3. Kafka
             .AddKafka(
-                setup: options => 
+                setup: kafkaOptions => 
                 {
-                    options.BootstrapServers = configuration["Kafka:BootstrapServers"]!;
+                    kafkaOptions.BootstrapServers = configuration[options.KafkaBootstrapServersKey]!;
                 },
                 name: "Kafka-Check",
                 tags: new[] { "infrastructure", "kafka" },
@@ -38,10 +46,10 @@ public class HealthMonitoringAbpModule : AbpModule
             .AddCheck("FilePath-Check", () => 
             {
                 // Rely strictly on configuration
-                var testPath = configuration["HealthChecks:FilePath"];
+                var testPath = configuration[options.FilePathKey];
                 if (string.IsNullOrEmpty(testPath)) 
                 {
-                    return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("HealthChecks:FilePath configuration is missing.");
+                    return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy($"{options.FilePathKey} configuration is missing.");
                 }
 
                 try
@@ -59,7 +67,7 @@ public class HealthMonitoringAbpModule : AbpModule
             }, tags: new[] { "infrastructure", "filepath" }, timeout: timeout)
             // 5. Oracle DB Check (Basic / Readiness)
             .AddOracle(
-                configuration.GetConnectionString("Oracle")!,
+                configuration.GetConnectionString(options.OracleConnectionName) ?? configuration[options.OracleConnectionName]!,
                 name: "Oracle-Basic-Check",
                 tags: new[] { "infrastructure", "database", "oracle" },
                 timeout: timeout);
