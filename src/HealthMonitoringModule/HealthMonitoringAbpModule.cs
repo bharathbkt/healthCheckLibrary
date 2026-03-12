@@ -27,30 +27,49 @@ public class HealthMonitoringAbpModule : AbpModule
         var timeoutSeconds = configuration.GetValue<int>(options.TimeoutSecondsKey, 3);
         var timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
-        context.Services.AddHealthChecks()
-            // 1. Redis
-            .AddRedis(
-                redisConnectionString: configuration[options.RedisConnectionStringKey]!,
+        var healthChecksBuilder = context.Services.AddHealthChecks();
+
+        // 1. Redis
+        var redisConnectionString = configuration[options.RedisConnectionStringKey];
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            healthChecksBuilder.AddRedis(
+                redisConnectionString: redisConnectionString,
                 name: "Redis-Check",
                 tags: new[] { "infrastructure", "redis" },
-                timeout: timeout)
-            // 2. MongoDB
-            .AddMongoDb(
-                mongodbConnectionString: configuration[options.MongoDbConnectionStringKey]!,
+                timeout: timeout);
+        }
+
+        // 2. MongoDB
+        var mongoDbConnectionString = configuration[options.MongoDbConnectionStringKey];
+        if (!string.IsNullOrWhiteSpace(mongoDbConnectionString))
+        {
+            healthChecksBuilder.AddMongoDb(
+                mongodbConnectionString: mongoDbConnectionString,
                 name: "MongoDb-Check",
                 tags: new[] { "infrastructure", "mongodb"},
-                timeout: timeout)
-            // 3. Kafka
-            .AddKafka(
+                timeout: timeout);
+        }
+
+        // 3. Kafka
+        var kafkaBootstrapServers = configuration[options.KafkaBootstrapServersKey];
+        if (!string.IsNullOrWhiteSpace(kafkaBootstrapServers))
+        {
+            healthChecksBuilder.AddKafka(
                 setup: kafkaOptions => 
                 {
-                    kafkaOptions.BootstrapServers = configuration[options.KafkaBootstrapServersKey]!;
+                    kafkaOptions.BootstrapServers = kafkaBootstrapServers;
                 },
                 name: "Kafka-Check",
                 tags: new[] { "infrastructure", "kafka" },
-                timeout: timeout)
-            // 4. Filepath Access Check
-            .AddCheck("FilePath-Check", () => 
+                timeout: timeout);
+        }
+
+        // 4. Filepath Access Check
+        var filePath = configuration[options.FilePathKey];
+        if (!string.IsNullOrWhiteSpace(filePath))
+        {
+            healthChecksBuilder.AddCheck("FilePath-Check", () => 
             {
                 // Rely strictly on configuration
                 var testPath = configuration[options.FilePathKey];
@@ -71,13 +90,19 @@ public class HealthMonitoringAbpModule : AbpModule
                 {
                     return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy($"Failed to access directory {testPath}.", ex);
                 }
-            }, tags: new[] { "infrastructure", "filepath" }, timeout: timeout)
-            // 5. Oracle DB Check (Basic / Readiness)
-            .AddOracle(
-                configuration[options.OracleConnectionStringKey]!,
+            }, tags: new[] { "infrastructure", "filepath" }, timeout: timeout);
+        }
+
+        // 5. Oracle DB Check (Basic / Readiness)
+        var oracleConnectionString = configuration[options.OracleConnectionStringKey];
+        if (!string.IsNullOrWhiteSpace(oracleConnectionString))
+        {
+            healthChecksBuilder.AddOracle(
+                oracleConnectionString,
                 name: "Oracle-Basic-Check",
                 tags: new[] { "infrastructure", "database", "oracle" },
                 timeout: timeout);
+        }
                 
         // Note: The Deep Oracle Schema Validation (DB-First) Health Check 
         // typically needs to be registered here targeting an specific EF Core DbContext:
