@@ -10,12 +10,19 @@ public class HealthMonitoringAbpModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         
-        // Bind settings from HealthMonitoring section
-        var options = new HealthMonitoringOptions();
-        configuration.GetSection("HealthMonitoring").Bind(options);
+        // Execute pre-configured actions from dependent modules
+        var options = context.Services.ExecutePreConfiguredActions<HealthMonitoringOptions>();
 
         // Make options available in DI for future use
-        context.Services.Configure<HealthMonitoringOptions>(configuration.GetSection("HealthMonitoring"));
+        context.Services.Configure<HealthMonitoringOptions>(opt => 
+        {
+            opt.RedisConnectionStringKey = options.RedisConnectionStringKey;
+            opt.MongoDbConnectionStringKey = options.MongoDbConnectionStringKey;
+            opt.OracleConnectionStringKey = options.OracleConnectionStringKey;
+            opt.KafkaBootstrapServersKey = options.KafkaBootstrapServersKey;
+            opt.FilePathKey = options.FilePathKey;
+            opt.TimeoutSecondsKey = options.TimeoutSecondsKey;
+        });
 
         var timeoutSeconds = configuration.GetValue<int>(options.TimeoutSecondsKey, 3);
         var timeout = TimeSpan.FromSeconds(timeoutSeconds);
@@ -23,13 +30,13 @@ public class HealthMonitoringAbpModule : AbpModule
         context.Services.AddHealthChecks()
             // 1. Redis
             .AddRedis(
-                redisConnectionString: configuration.GetConnectionString(options.RedisConnectionName) ?? configuration[options.RedisConnectionName]!,
+                redisConnectionString: configuration[options.RedisConnectionStringKey]!,
                 name: "Redis-Check",
                 tags: new[] { "infrastructure", "redis" },
                 timeout: timeout)
             // 2. MongoDB
             .AddMongoDb(
-                mongodbConnectionString: configuration.GetConnectionString(options.MongoDbConnectionName) ?? configuration[options.MongoDbConnectionName]!,
+                mongodbConnectionString: configuration[options.MongoDbConnectionStringKey]!,
                 name: "MongoDb-Check",
                 tags: new[] { "infrastructure", "mongodb"},
                 timeout: timeout)
@@ -67,7 +74,7 @@ public class HealthMonitoringAbpModule : AbpModule
             }, tags: new[] { "infrastructure", "filepath" }, timeout: timeout)
             // 5. Oracle DB Check (Basic / Readiness)
             .AddOracle(
-                configuration.GetConnectionString(options.OracleConnectionName) ?? configuration[options.OracleConnectionName]!,
+                configuration[options.OracleConnectionStringKey]!,
                 name: "Oracle-Basic-Check",
                 tags: new[] { "infrastructure", "database", "oracle" },
                 timeout: timeout);

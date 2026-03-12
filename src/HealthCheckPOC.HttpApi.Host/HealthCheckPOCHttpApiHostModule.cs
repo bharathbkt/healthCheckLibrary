@@ -21,6 +21,16 @@ namespace HealthCheckPOC.HttpApi.Host;
 )]
 public class HealthCheckPOCHttpApiHostModule : AbpModule
 {
+    public override void PreConfigureServices(ServiceConfigurationContext context)
+    {
+        PreConfigure<HealthMonitoringOptions>(options =>
+        {
+            options.RedisConnectionStringKey = "appsettings:redisconnection";
+            options.OracleConnectionStringKey = "dbSettings:oracleconnection";
+            options.MongoDbConnectionStringKey = "dbSettings:mongodbconnection";
+        });
+    }
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
