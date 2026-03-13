@@ -17,8 +17,8 @@ public class HealthMonitoringAbpModule : AbpModule
         context.Services.Configure<HealthMonitoringOptions>(opt => 
         {
             opt.RedisConnectionStringKey = options.RedisConnectionStringKey;
-            opt.MongoDbConnectionStringKey = options.MongoDbConnectionStringKey;
-            opt.OracleConnectionStringKey = options.OracleConnectionStringKey;
+            opt.MongoDbConnectionStringKeys = options.MongoDbConnectionStringKeys;
+            opt.OracleConnectionStringKeys = options.OracleConnectionStringKeys;
             opt.KafkaBootstrapServersKey = options.KafkaBootstrapServersKey;
             opt.FilePathKey = options.FilePathKey;
             opt.TimeoutSecondsKey = options.TimeoutSecondsKey;
@@ -41,14 +41,21 @@ public class HealthMonitoringAbpModule : AbpModule
         }
 
         // 2. MongoDB
-        var mongoDbConnectionString = configuration[options.MongoDbConnectionStringKey];
-        if (!string.IsNullOrWhiteSpace(mongoDbConnectionString))
+        if (options.MongoDbConnectionStringKeys != null)
         {
-            healthChecksBuilder.AddMongoDb(
-                mongodbConnectionString: mongoDbConnectionString,
-                name: "MongoDb-Check",
-                tags: new[] { "infrastructure", "mongodb"},
-                timeout: timeout);
+            int mongoIndex = 1;
+            foreach (var key in options.MongoDbConnectionStringKeys)
+            {
+                var connectionString = configuration[key];
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    healthChecksBuilder.AddMongoDb(
+                        mongodbConnectionString: connectionString,
+                        name: $"MongoDb-Check-{mongoIndex++}",
+                        tags: new[] { "infrastructure", "mongodb"},
+                        timeout: timeout);
+                }
+            }
         }
 
         // 3. Kafka
@@ -94,14 +101,21 @@ public class HealthMonitoringAbpModule : AbpModule
         }
 
         // 5. Oracle DB Check (Basic / Readiness)
-        var oracleConnectionString = configuration[options.OracleConnectionStringKey];
-        if (!string.IsNullOrWhiteSpace(oracleConnectionString))
+        if (options.OracleConnectionStringKeys != null)
         {
-            healthChecksBuilder.AddOracle(
-                oracleConnectionString,
-                name: "Oracle-Basic-Check",
-                tags: new[] { "infrastructure", "database", "oracle" },
-                timeout: timeout);
+            int oracleIndex = 1;
+            foreach (var key in options.OracleConnectionStringKeys)
+            {
+                var connectionString = configuration[key];
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    healthChecksBuilder.AddOracle(
+                        connectionString,
+                        name: $"Oracle-Basic-Check-{oracleIndex++}",
+                        tags: new[] { "infrastructure", "database", "oracle" },
+                        timeout: timeout);
+                }
+            }
         }
                 
         // Note: The Deep Oracle Schema Validation (DB-First) Health Check 

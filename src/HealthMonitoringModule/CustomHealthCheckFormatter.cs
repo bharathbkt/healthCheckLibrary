@@ -46,15 +46,35 @@ public static class CustomHealthCheckFormatter
     {
         if (options == null || configuration == null) return null;
 
-        return checkName switch
+        if (checkName == "Redis-Check") return configuration[options.RedisConnectionStringKey];
+        if (checkName == "Kafka-Check") return configuration[options.KafkaBootstrapServersKey];
+        if (checkName == "FilePath-Check") return configuration[options.FilePathKey];
+        
+        if (checkName == "Oracle-Schema-Deep-Check") 
         {
-            "Redis-Check" => configuration[options.RedisConnectionStringKey],
-            "MongoDb-Check" => configuration[options.MongoDbConnectionStringKey],
-            "Kafka-Check" => configuration[options.KafkaBootstrapServersKey],
-            "Oracle-Basic-Check" => configuration[options.OracleConnectionStringKey],
-            "FilePath-Check" => configuration[options.FilePathKey],
-            "Oracle-Schema-Deep-Check" => configuration[options.OracleConnectionStringKey],
-            _ => null
-        };
+             return options.OracleConnectionStringKeys != null && options.OracleConnectionStringKeys.Count > 0 
+                ? configuration[options.OracleConnectionStringKeys[0]] 
+                : null;
+        }
+
+        if (checkName.StartsWith("MongoDb-Check-"))
+        {
+            if (int.TryParse(checkName.Replace("MongoDb-Check-", ""), out int index) && options.MongoDbConnectionStringKeys != null && index >= 1 && index <= options.MongoDbConnectionStringKeys.Count)
+            {
+                return configuration[options.MongoDbConnectionStringKeys[index - 1]];
+            }
+            return null;
+        }
+
+        if (checkName.StartsWith("Oracle-Basic-Check-"))
+        {
+            if (int.TryParse(checkName.Replace("Oracle-Basic-Check-", ""), out int index) && options.OracleConnectionStringKeys != null && index >= 1 && index <= options.OracleConnectionStringKeys.Count)
+            {
+                return configuration[options.OracleConnectionStringKeys[index - 1]];
+            }
+            return null;
+        }
+
+        return null;
     }
 }

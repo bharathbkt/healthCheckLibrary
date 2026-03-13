@@ -27,7 +27,16 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
         {
             //options.RedisConnectionStringKey = "appsettings:redisconnection";
             //options.OracleConnectionStringKey = "dbSettings:oracleconnection";
-            options.MongoDbConnectionStringKey = "dbSettings:mongodbconnection";
+            options.MongoDbConnectionStringKeys = new System.Collections.Generic.List<string> 
+            { 
+                "dbSettings:mongodbconnection",
+                "dbSettings:mongodbconnection2"
+            };
+            //options.OracleConnectionStringKeys = new System.Collections.Generic.List<string> 
+            //{ 
+            //    "dbSettings:oracleconnection",
+            //    "dbSettings:oracleconnection2"
+            //};
         });
     }
 
