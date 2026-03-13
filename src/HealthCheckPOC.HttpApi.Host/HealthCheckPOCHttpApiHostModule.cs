@@ -25,8 +25,8 @@ public class HealthCheckPOCHttpApiHostModule : AbpModule
     {
         PreConfigure<HealthMonitoringOptions>(options =>
         {
-            options.RedisConnectionStringKey = "appsettings:redisconnection";
-            options.OracleConnectionStringKey = "dbSettings:oracleconnection";
+            //options.RedisConnectionStringKey = "appsettings:redisconnection";
+            //options.OracleConnectionStringKey = "dbSettings:oracleconnection";
             options.MongoDbConnectionStringKey = "dbSettings:mongodbconnection";
         });
     }
